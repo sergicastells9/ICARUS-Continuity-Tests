@@ -258,7 +258,7 @@ void examineWaveform(string path)
 	TIter next(f_hist.GetListOfKeys()); //create iterator of keys within .root file
 	TKey* key; //creates blank key to be used later
 	TNtuple* peaks = new TNtuple("peaks", "stats of signal peaks", "n:x:y:w:h"); //creates TNtuple with x,y,width,height variables
-	TNtuple* waveform = new TNtuple("waveform", "waveform attributes", "n:b:s:p");
+	TNtuple* waveform = new TNtuple("waveform", "waveform attributes", "n:b:s");
 	string name; //for name of certain histogram
 	TH1F* hist; //temporary histogram
 	TNtuple* num_peaks = new TNtuple("num_peaks", "number of peaks per waveform", "p"); //creates TNtuple to save number of peaks per waveform
@@ -294,6 +294,7 @@ void examineWaveform(string path)
 		double width1 = 0,width2 = 0,swidth = 0;
 		int check1 = 0;
 		num = 0;
+		bool check2 = true;
 
 		/* Algorithm for analyzing waveforms:
 		//  -loop through all bins excluding under-/over-flow bins
@@ -354,6 +355,7 @@ void examineWaveform(string path)
 						num += 1;
 						peaks->SetDirectory(0);
 						peaks->Fill((float)num, x_crit,y_crit,swidth,peak_height);
+						check2 = false;
 					}
 				}
 				
@@ -362,10 +364,11 @@ void examineWaveform(string path)
 			}
 		}
 		
-		if(peak_height == 0)
+		if(check2)
 		{
 			peaks->SetDirectory(0);
 			peaks->Fill((float)num,x_crit,y_crit,swidth,peak_height);
+			check2 = false;
 		}
 
 		num_peaks->Fill(num);
@@ -387,7 +390,7 @@ void examineWaveform(string path)
 		{
 			saveHist(name, path, "Time (#mus)", "Voltage (V)");
 		}
-		waveform->Fill((float)num, (float)baseline, (float)rms_noise, (float)num);
+		waveform->Fill((float)num, (float)baseline, (float)rms_noise);
 
 		delete hist;
 	}
@@ -578,7 +581,7 @@ void signalStats(string path)
 	for(int i = 0; i < peaks->GetEntries(); i++)
 	{
 		peaks->GetEntry(i);
-		line = to_string(n) + "," + to_string(x) + "," + to_string(y) + "," + to_string(w) + "," + to_string(h);
+		line = to_string(int(n)) + "," + to_string(x) + "," + to_string(y) + "," + to_string(w) + "," + to_string(h);
 		out_file << line << '\n';
 	}
 
@@ -597,19 +600,18 @@ void waveformAttributes(string path)
 	ofstream out_file;
 	out_file.open(filename);
 
-	float n, b, s, p;
+	float n, b, s;
 
 	waveform->SetBranchAddress("b", &b);
 	waveform->SetBranchAddress("n", &n);
 	waveform->SetBranchAddress("s", &s);
-	waveform->SetBranchAddress("p", &p);
-
+	
 	string line;
 
 	for(int i = 0; i < waveform->GetEntries(); i++)
 	{
 		waveform->GetEntry(i);
-		line = to_string(n) + "," + to_string(b) + "," + to_string(s) + "," + to_string(p);
+		line = to_string(int(n)) + "," + to_string(b) + "," + to_string(s);
 		out_file << line << '\n';
 	}
 
