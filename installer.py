@@ -1,3 +1,5 @@
+#written by Sergi Castells
+
 import subprocess as sp
 import zipfile
 
@@ -66,18 +68,21 @@ fi
 	sp.Popen(['ssh','-Y','%s@%s' % (user, icarus_machine),'mv','%s/mv2ic.txt' % icarus_dest,'%s/mv2ic.sh' % icarus_dest])
 	sp.Popen(['ssh','-Y','%s@%s' % (user, icarus_machine),'chmod','+x','%s/mv2ic.sh' % icarus_dest])
         
-	sp.check_output(['scp','./install_code/run_slow.c','%s@%s:%s' % (user,icarus_machine,icarus_dest)])
 	sp.check_output(['scp','./install_code/run_fast.c','%s@%s:%s' % (user,icarus_machine,icarus_dest)])
 	sp.check_output(['scp','./install_code/analyze.c','%s@%s:%s' % (user,icarus_machine,icarus_dest)])
 	
-	sp.check_output(['scp','./install_code/scope-reader.py','%s@%s:%s' % (user,python_machine,python_dest)])
+	sp.check_output(['scp','./install_code/test_stats.txt','%s@%s:%s' % (user,python_machine,python_dest)])
+	sp.check_output(['scp','./install_code/scope_reader.py','%s@%s:%s' % (user,python_machine,python_dest)])
 	sp.check_output(['scp','./install_code/DataLoader.py','%s@%s:%s' % (user,python_machine,python_dest)])
+	sp.check_output(['scp','./install_code/waveform_id.txt','%s@%s:%s' % (user,python_machine,python_dest)])
+	sp.check_output(['scp','./install_code/waveform_list.txt','%s@%s:%s' % (user,python_machine,python_dest)])
+
 	
 	sp.check_output(['rm','-r','./install_code'])
 	sp.check_output(['rm','mv2ic.txt'])
-		
+	
 	sp.check_output(['rm','code_for_install.zip'])
-        
+	
 	sp.check_output(['reset'])
 
 	print("Install completed successfully.")
